@@ -1,0 +1,23 @@
+{
+    "compilerOptions": {
+        "module": "NodeNext",
+        "esModuleInterop": true,
+        "allowSyntheticDefaultImports": true,
+        "target": "ES2020",
+        "noImplicitAny": true,
+        "moduleResolution": "NodeNext",
+        "sourceMap": true,
+        "outDir": "dist",
+        "baseUrl": ".",
+        "paths": {
+            "*": [
+                "node_modules/@types/*",
+                "src/types/*"
+            ]
+        },
+        "strictNullChecks": true,
+    },
+    "include": [
+        "src/**/*"
+    ]
+}
