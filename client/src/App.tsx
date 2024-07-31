@@ -7,7 +7,8 @@ function App() {
 
   const handleFetch = async () => {
     setCount((c) => c + 1);
-    const res = await fetch('http://localhost:3000');
+    const url = import.meta.env.VITE_SERVER_URL;
+    const res = await fetch(`${url}/`);
     console.log(res);
     const data = await res.json();
     console.log(data);
@@ -18,6 +19,7 @@ function App() {
     <>
       <h1>QuoteChat</h1>
       <h2>Express says: {message}</h2>
+      <h3>It is {import.meta.env.VITE_SERVER_URL}</h3>
       <div className='card'>
         <button onClick={handleFetch}>Ping {count}</button>
       </div>
