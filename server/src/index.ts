@@ -1,4 +1,7 @@
 const inProduction = process.env.NODE_ENV === 'production';
+const clientUri = inProduction
+  ? 'https://quote-chat.vercel.app/'
+  : 'http://localhost:5173';
 
 import { configDotenv } from 'dotenv';
 
@@ -34,8 +37,6 @@ db.once('open', async () => {
   console.log('Mongo connected');
 });
 
-app.use(cors());
-
 // SESSION
 
 // Set up session
@@ -44,6 +45,7 @@ app.use(
     secret: process.env.SECRET!,
     resave: false,
     saveUninitialized: false,
+    // store: {} TODO
   }),
 );
 
@@ -90,6 +92,13 @@ passport.use(
   ),
 );
 
+app.use(
+  cors({
+    origin: clientUri,
+    credentials: true,
+  }),
+);
+
 app.get(
   '/auth/google',
   passport.authenticate('google', { scope: ['profile', 'email'] }),
@@ -101,9 +110,7 @@ app.get(
   (req, res) => {
     // Successful authentication, redirect to React app
     console.log(req.user);
-    res.redirect(
-      inProduction ? 'https://quote-chat.vercel.app/' : 'http://localhost:5173',
-    );
+    res.redirect(clientUri);
   },
 );
 
@@ -157,12 +164,13 @@ app.get(
 // TODO test
 app.get('/env', (req, res) => {
   const nodeEnv = process.env.NODE_ENV || 'NOT SET';
-  res.json({ nodeEnv });
+  res.json({ nodeEnv, clientUri });
 });
 
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
+  console.log(mongoose.isValidObjectId(''));
   inProduction
     ? console.log(`[production] 🚀 Server is listening on port ${PORT}`)
     : console.log(`[development] 🚀 Server is listening on port ${PORT}`);

@@ -1,68 +1,94 @@
-import { useEffect, useRef, useState } from 'react';
-import './App.css';
-// import { useFetch } from './hooks/useFetch';
+import { useEffect, useMemo, useState } from 'react';
 import type Quote from './models/Quote';
+import AuthTest from './AuthTest';
+import ChatList from './components/ChatList';
+import Chat from './components/Chat';
+import MessageList from './components/Chat/MessageList';
+import ChatInput from './components/Chat/ChatInput';
+import Header from './components/Chat/Header';
+import type ChatModel from './models/Chat';
+import type MessageModel from './models/Message';
+import { initChats } from './initData';
+import './App.css';
 
 function App() {
-  const [count, setCount] = useState(0);
-  // const [message, setMessage] = useState('');
+  const [chats, setChats] = useState<ChatModel[]>(initChats);
+  const [currentChatId, setCurrentChatId] = useState<string | null>(null);
 
-  const [messages, setMessages] = useState<string[]>([]);
-
-  const inputEl = useRef<HTMLInputElement>(null);
+  const currentChat = useMemo(() => {
+    return chats.find((c) => c._id === currentChatId);
+  }, [chats, currentChatId]);
 
   useEffect(() => {
-    console.log(messages);
-  }, [messages]);
+    console.log(currentChatId);
+  }, [currentChatId]);
 
-  const handleFetch = async () => {
-    setCount((c) => c + 1);
+  const appendMessage = (message: MessageModel) => {
+    if (!currentChatId) return;
+    setChats((prev) =>
+      prev.map((chat) =>
+        chat._id === currentChatId
+          ? { ...chat, messages: [...chat.messages, message] }
+          : chat,
+      ),
+    );
+  };
+
+  const fetchQuote = async () => {
     const url = import.meta.env.VITE_SERVER_URL;
     const res = await fetch(`${url}/quote3sec`);
     const data: { quote: Quote } = await res.json();
-    data && setMessages((prev) => [...prev, data.quote.content]);
+    const message: MessageModel = {
+      isBot: true,
+      content: data.quote.content,
+      timestamp: new Date(),
+    };
+    appendMessage(message);
   };
 
-  const handleSend = (message: string) => {
-    if (!message) return;
-    setMessages((prev) => [...prev, message]);
-    inputEl.current && (inputEl.current.value &&= '');
+  const handleSend = (messageStr: string) => {
+    if (!messageStr) return;
+    const message: MessageModel = {
+      isBot: false,
+      content: messageStr,
+      timestamp: new Date(),
+    };
+    appendMessage(message);
+    fetchQuote();
   };
 
   // const isString = (value: unknown): value is string => {
   //   return typeof value === 'string';
   // };
 
-  const handleSubmit = (ev: React.FormEvent<HTMLFormElement>) => {
-    ev.preventDefault();
-    const message = inputEl.current?.value;
-    if (!message) return;
-
-    handleSend(message);
-    handleFetch();
-
-    // const formData = new FormData(ev.currentTarget);
-    // const data = Object.fromEntries(formData);
-    // if (isString(data.message)) {
-    //   handleSend(data.message);
-    // }
+  const handleSelectChat = (id: string) => {
+    setCurrentChatId(() => id);
   };
 
   return (
     <>
-      <h1>QuoteChat</h1>
-      <form onSubmit={handleSubmit}>
-        <input ref={inputEl} type='text' name='message' />
-        <button type='submit'>send</button>
-      </form>
+      <main style={{ display: 'flex', gap: '2rem' }}>
+        <div style={{ width: '40rem' }}>
+          <ChatList
+            chats={chats}
+            onSelect={(id: string) => handleSelectChat(id)}
+          />
+        </div>
+        <div style={{ width: '20rem' }}>
+          {currentChat ? (
+            <Chat>
+              <Header botName={currentChat.botName} />
+              <MessageList messages={currentChat.messages} />
+              <ChatInput onSubmit={handleSend} />
+            </Chat>
+          ) : (
+            <p>please select one of the chats</p>
+          )}
+        </div>
+      </main>
 
-      {messages.map((m, idx) => (
-        <p key={idx}>{m}</p>
-      ))}
+      <AuthTest />
 
-      <div className='card'>
-        <button onClick={handleFetch}>Ping {count}</button>
-      </div>
       <p className='read-the-docs'>It is {import.meta.env.VITE_SERVER_URL}</p>
     </>
   );
