@@ -7,10 +7,22 @@ const messageSchema = new Schema({
 });
 
 const chatSchema = new Schema({
-  userId: { type: Schema.Types.ObjectId, ref: 'User' },
+  ownerId: { type: Schema.Types.ObjectId, ref: 'User' },
+  botName: String,
   messages: [messageSchema],
 });
 
-const Chat = mongoose.model('Chat', chatSchema);
+export interface IChat extends Document {
+  _id: mongoose.Types.ObjectId;
+  ownerId: mongoose.Types.ObjectId;
+  botName: string;
+  messages: Array<{
+    isBot: boolean;
+    content: string;
+    timestamp: Date;
+  }>;
+}
+
+const Chat = mongoose.model<IChat>('Chat', chatSchema);
 
 export default Chat;

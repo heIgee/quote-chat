@@ -1,196 +1,50 @@
-const inProduction = process.env.NODE_ENV === 'production';
-const clientUri = inProduction
-  ? 'https://quote-chat.vercel.app'
-  : 'http://localhost:5173';
-
 import { configDotenv } from 'dotenv';
-
-if (!inProduction) {
-  configDotenv();
-}
-
-import express from 'express';
-import session from 'express-session';
-import asyncHandler from 'express-async-handler';
-
+import express, { NextFunction } from 'express';
+import mongoose from 'mongoose';
+import passport from 'passport';
 import cors from 'cors';
 
-import passport from 'passport';
-import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
-
-import mongoose from 'mongoose';
-import MongoStore from 'connect-mongo';
-import User from './models/User.js';
+import { connectMongo } from './config/mongo.config.js';
+import { configureSession } from './config/session.config.js';
+import authRouter from './routes/authRouter.js';
+import quoteRouter from './routes/quoteRouter.js';
+import chatsRouter from './routes/chatsRouter.js';
 
 const app = express();
 
-// MONGO
+import { inProduction, clientUri } from './config/global.config.js';
+import { configurePassport } from './config/passport.config.js';
+import { errorHandler } from './middleware/errorHandler.js';
 
-const dbUrl = process.env.ATLAS_URL!;
-const dbName = 'quote';
+if (!inProduction) configDotenv();
 
-mongoose.connect(dbUrl, { dbName });
-
-const db = mongoose.connection;
-
-db.on('error', (err) => {
-  console.error('Mongo failed:', err);
-});
-
-db.once('open', async () => {
-  console.log('Mongo connected');
-});
-
-// SESSION
+connectMongo();
 
 app.set('trust proxy', 1);
 
-app.use(
-  session({
-    secret: process.env.SECRET!,
-    resave: false,
-    saveUninitialized: true, // debug
-    store: MongoStore.create({
-      mongoUrl: dbUrl,
-      dbName,
-      touchAfter: 24 * 3600,
-    }),
-    cookie: {
-      secure: inProduction,
-      httpOnly: true,
-      sameSite: inProduction ? 'none' : 'lax',
-      maxAge: 24 * 60 * 60 * 1000, // 24 hours
-    },
-  }),
-);
+app.use(express.json());
+
+app.use(cors({ origin: clientUri, credentials: true }));
+app.use(configureSession());
 
 app.use(passport.initialize());
 app.use(passport.session());
+configurePassport();
 
-passport.serializeUser((user: any, done) => {
-  done(null, user.id);
-});
-
-passport.deserializeUser(async (id, done) => {
-  try {
-    const user = await User.findById(id);
-    done(null, user);
-  } catch (error) {
-    done(error, null);
-  }
-});
-
-// TODO fix oauth uri_mismatch without hardcoding uri
-const callbackURL = inProduction
-  ? 'https://server-quiet-waterfall-3430.fly.dev/auth/google/callback'
-  : 'http://localhost:3000/auth/google/callback';
-
-passport.use(
-  new GoogleStrategy(
-    {
-      clientID: process.env.GOOGLE_CLIENT_ID!,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-      callbackURL: callbackURL,
-    },
-    async (accessToken, refreshToken, profile, done) => {
-      try {
-        let user = await User.findOne({ googleId: profile.id });
-        if (!user) {
-          user = await User.create({
-            googleId: profile.id,
-            displayName: profile.displayName,
-            email: profile.emails?.[0] ? profile.emails[0].value : '',
-          });
-        }
-        return done(null, user);
-      } catch (error) {
-        return done(error, false);
-      }
-    },
-  ),
-);
-
-app.use(
-  cors({
-    origin: clientUri,
-    credentials: true,
-  }),
-);
-
-app.get(
-  '/auth/google',
-  passport.authenticate('google', { scope: ['profile', 'email'] }),
-);
-
-app.get(
-  '/auth/google/callback',
-  passport.authenticate('google', { failureRedirect: '/auth/fail' }),
-  (req, res) => {
-    // auth successfull, redirect to React
-    console.log('Authentication successful, user:', req.user);
-    console.log('Session:', req.session);
-    res.redirect(clientUri);
-  },
-);
-
-app.get('/auth/fail', (req, res) => {
-  console.log('Authentication failed');
-  console.log(req);
-  res.json({ error: 'Authentication failed', req });
-});
-
-app.get('/auth/logout', (req, res, next) => {
-  req.logout((err) => {
-    if (err) {
-      return next(err);
-    }
-    res.redirect('/');
-  });
-});
-
-app.get('/auth/status', (req, res) => {
-  res.json({ user: req.user || null });
-});
-
-app.get(
-  '/',
-  asyncHandler(async (req, res) => {
-    const quoteRes = await fetch('https://api.quotable.io/random');
-    const quote = await quoteRes.json();
-    res.status(200).json({ quote });
-  }),
-);
-
-app.get(
-  '/quote3sec',
-  asyncHandler(async (req, res) => {
-    const startTime = Date.now();
-
-    const quotePromise = fetch('https://api.quotable.io/random').then(
-      (response) => response.json(),
-    );
-    const delayPromise = new Promise((resolve) => setTimeout(resolve, 3000));
-    const [quote] = await Promise.all([quotePromise, delayPromise]);
-
-    const elapsedTime = Date.now() - startTime;
-
-    if (elapsedTime < 3000) {
-      await new Promise((resolve) => setTimeout(resolve, 3000 - elapsedTime));
-    }
-
-    res.json({ quote });
-  }),
-);
+app.use('/auth', authRouter);
+app.use('/quote', quoteRouter);
+app.use('/chats', chatsRouter);
 
 app.get('/env', (req, res) => {
   const nodeEnv = process.env.NODE_ENV || 'NOT SET';
   res.json({ nodeEnv, clientUri });
 });
 
+app.use(errorHandler);
+
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
-  console.log(mongoose.isValidObjectId(''));
   inProduction
     ? console.log(`[production] 🚀 Server is listening on port ${PORT}`)
     : console.log(`[development] 🚀 Server is listening on port ${PORT}`);
