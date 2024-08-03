@@ -1,8 +1,14 @@
 import Chat from './models/Chat';
 
+function generateObjectId(): string {
+  return [...Array(24)]
+    .map(() => Math.floor(Math.random() * 16).toString(16))
+    .join('');
+}
+
 export const initChats: Chat[] = [
   {
-    _id: '1',
+    _id: generateObjectId(),
     ownerId: null,
     botName: 'Robert M. Pirsig',
     messages: [
@@ -14,7 +20,7 @@ export const initChats: Chat[] = [
     ],
   },
   {
-    _id: '2',
+    _id: generateObjectId(),
     ownerId: null,
     botName: 'Albert Einstein',
     messages: [
@@ -31,7 +37,7 @@ export const initChats: Chat[] = [
     ],
   },
   {
-    _id: '3',
+    _id: generateObjectId(),
     ownerId: null,
     botName: 'Marie Curie',
     messages: [

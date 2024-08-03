@@ -9,10 +9,11 @@ export default function ChatList({
   onSelect: (id: string) => void;
 }) {
   return (
-    <>
+    <section style={{ outline: '1px dashed yellow' }}>
+      <p>All your chats</p>
       {chats.map((c) => (
         <ChatPreview key={c._id} chat={c} onSelect={onSelect} />
       ))}
-    </>
+    </section>
   );
 }

@@ -6,6 +6,7 @@ export default function Message({ message }: { message: MessageModel }) {
     <div
       style={{
         textAlign: isBot ? 'left' : 'right',
+        alignSelf: isBot ? 'start' : 'end',
         backgroundColor: isBot ? 'darkcyan' : 'black',
         maxWidth: '20rem',
       }}
