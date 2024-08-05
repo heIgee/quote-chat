@@ -34,7 +34,7 @@ export default function AuthPanel({
           ) : (
             <>
               <h4 style={{ display: 'inline-block', margin: 0 }}>
-                Please log in
+                Please log in to save your chats
               </h4>
               <button onClick={onLogin}>Login with Google</button>
             </>

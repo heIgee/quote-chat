@@ -1,0 +1,21 @@
+.main {
+  display: flex;
+  justify-content: center;
+  min-height: 90vh;
+  gap: 2rem;
+  height: 80vh;
+}
+
+@media (width < 768px) {
+  .main {
+    flex-direction: column;
+  }
+  .main > * {
+    width: 100% !important;
+    height: 45%;
+  }
+
+  body {
+    overflow-y: hidden;
+  }
+}

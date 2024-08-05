@@ -1,5 +1,5 @@
 export default interface Message {
-  _id?: string;
+  _id: string;
   isBot: boolean;
   content: string;
   timestamp: Date;

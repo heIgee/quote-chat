@@ -17,8 +17,7 @@ router.get('/', isAuthenticated, async (req, res, next) => {
 
 router.put('/', isAuthenticated, async (req, res, next) => {
   try {
-    console.log(`Put chats from:`, req.user);
-
+    // console.log(`Put chats from:`, req.user);
     const { chats } = req.body as { chats: IChat[] };
     const userId = req.user!._id;
 
@@ -46,6 +45,32 @@ router.put('/', isAuthenticated, async (req, res, next) => {
     );
 
     res.json({ chats: updatedChats });
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.delete('/:id', isAuthenticated, async (req, res, next) => {
+  try {
+    const chatId = req.params.id;
+    const userId = req.user!._id;
+
+    if (!mongoose.Types.ObjectId.isValid(chatId)) {
+      return res.status(400).json({ message: 'Invalid chat ID' });
+    }
+
+    const deletedChat = await Chat.findOneAndDelete({
+      _id: chatId,
+      ownerId: userId,
+    });
+
+    if (!deletedChat) {
+      return res.status(404).json({
+        message: 'Chat not found or you do not have permission to delete it',
+      });
+    }
+
+    res.json({ message: 'Chat deleted successfully', deletedChat });
   } catch (error) {
     next(error);
   }
