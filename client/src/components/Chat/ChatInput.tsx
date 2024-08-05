@@ -15,10 +15,15 @@ export default function ChatInput({
   };
 
   return (
-    <div>
+    <div className='chat-input'>
       <form onSubmit={handleSubmit}>
-        <input ref={inputEl} type='text' name='message' />
-        <button type='submit'>send</button>
+        <input
+          ref={inputEl}
+          type='text'
+          name='message'
+          placeholder='your message here...'
+        />
+        <button type='submit'>Send</button>
       </form>
     </div>
   );

@@ -12,31 +12,24 @@ export default function AuthPanel({
   onLogout: () => void;
 }) {
   return (
-    <article
-      style={{
-        width: '100%',
-        display: 'flex',
-        justifyContent: 'space-between',
-        padding: '0 2rem',
-      }}
-    >
+    <article className='auth-panel'>
       {isChecking ? (
         <small>Checking your status...</small>
       ) : (
         <>
           {user ? (
             <>
-              <h4 style={{ display: 'inline-block', margin: 0 }}>
-                Welcome, {user.displayName}
-              </h4>
-              <button onClick={onLogout}>Logout</button>
+              <h4>Welcome, {user.displayName}</h4>
+              <button className='button' onClick={onLogout}>
+                Logout
+              </button>
             </>
           ) : (
             <>
-              <h4 style={{ display: 'inline-block', margin: 0 }}>
-                Please log in to save your chats
-              </h4>
-              <button onClick={onLogin}>Login with Google</button>
+              <h4>Please log in to save your chats</h4>
+              <button className='button button-primary' onClick={onLogin}>
+                Login with Google
+              </button>
             </>
           )}
         </>

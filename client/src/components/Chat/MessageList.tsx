@@ -20,15 +20,7 @@ export default function MessageList({
   }, [messages]);
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '1rem',
-        overflow: 'auto',
-        justifySelf: 'end',
-      }}
-    >
+    <div className='message-list'>
       {messages.map((m) => (
         <Message
           key={m._id}

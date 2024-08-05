@@ -13,11 +13,32 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+:root {
+  --bg-secondary: #2c2c2c;
+  --bg-subtertiary: #323232;
+  --bg-tertiary: #3a3a3a;
+  --bg-hover: #454545;
+  --bg-button: #4a4a4a;
+  --bg-button-hover: #5a5a5a;
+  --bg-delete: #800b00dd;
+  --bg-delete-hover: #db1a00;
+  
+  --text-primary: #f0f0f0;
+  --text-secondary: #e0e0e0;
+  --text-tertiary: #c0c0c0;
+  --text-muted: #a0a0a0;
+  --text-delete: #ff6b6b;
+
+  --bg-accent: #325892;
+  --bg-accent-hover: #2f71d4;
+  
+  --border-color: #5a5a5a;
+}
+
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-  /* outline: none !important; */
 }
 
 body {
@@ -28,15 +49,47 @@ body {
 }
 
 #root {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   width: 100%;
-  height: 100%;
+  height: 100vh;
   padding: 2rem;
 }
 
-/* @media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
+@media (width < 900px) {
+  body {
+    overflow-y: hidden;
   }
-} */
+  #root {
+    display: block;
+    padding: 1rem;
+  }
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    background-color: whitesmoke;
+
+    --bg-secondary: #f0f0f0;
+    --bg-subtertiary: #e8e8e8;
+    --bg-tertiary: #e0e0e0;
+    --bg-hover: #d0d0d0;
+    --bg-button: #c0c0c0;
+    --bg-button-hover: #b0b0b0;
+    --bg-delete: #fc7a7a;
+    --bg-delete-hover: #fa5454;
+
+    --text-primary: #2e2e2e;
+    --text-secondary: #3e3e3e;
+    --text-tertiary: #4e4e4e;
+    --text-muted: #6e6e6e;
+    --text-delete: #ff4c4c;
+
+    --bg-accent: #91cffb;
+    --bg-accent-hover: #589fd6;
+
+    --border-color: #b0b0b0;
+  }
+}
 

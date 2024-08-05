@@ -1,40 +1,50 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+
 import ChatList from './components/ChatList';
 import Chat from './components/Chat';
 import MessageList from './components/Chat/MessageList';
 import ChatInput from './components/Chat/ChatInput';
 import ChatHead from './components/Chat/ChatHead';
+import NavPanel from './components/NavPanel';
+import AuthPanel from './components/NavPanel/AuthPanel';
+import ChatPanel from './components/NavPanel/ChatPanel';
+import Toast from './components/Toast';
+
 import type ChatModel from './models/Chat';
 import type MessageModel from './models/Message';
 import type Quote from './models/Quote';
 import type User from './models/User';
+
 import { initChats } from './initData';
-import NavPanel from './components/NavPanel/NavPanel';
-import AuthPanel from './components/NavPanel/AuthPanel';
-import ChatPanel from './components/NavPanel/ChatPanel';
-import './App.css';
 import { generateObjectId } from './utils/generateObjectId';
+
+import '@fortawesome/fontawesome-free/css/all.min.css';
+import './App.css';
 
 const url = import.meta.env.VITE_SERVER_URL;
 
-console.log(initChats);
-
-// check auth status
-// logged in  - do NOT save chats, fetch first, find out if there are any
-// logged out - do NOT call anything
+interface Toast {
+  id: string;
+  botName: string;
+  message: string;
+}
 
 function App() {
   const [chats, setChats] = useState<ChatModel[]>([]);
   const [currentChatId, setCurrentChatId] = useState<string | null>(null);
+  const currentChatIdRef = useRef<string | null>(null);
+  currentChatIdRef.current = currentChatId;
 
   const [user, setUser] = useState<User | null>(null);
   const [isChecking, setIsChecking] = useState(true);
 
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const [toasts, setToasts] = useState<Toast[]>([]);
+
   const currentChat = useMemo(() => {
     return chats.find((c) => c._id === currentChatId);
   }, [chats, currentChatId]);
-
-  const [searchTerm, setSearchTerm] = useState('');
 
   const filteredChats = chats.filter((chat) =>
     chat.botName.toLocaleLowerCase().includes(searchTerm.toLocaleLowerCase()),
@@ -44,20 +54,24 @@ function App() {
     checkAuthStatus();
   }, []);
 
-  const remoteSaveChats = useCallback(async (chatsToSave: ChatModel[]) => {
-    try {
-      await fetch(`${url}/chats`, {
-        method: 'PUT',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ chats: chatsToSave }),
-      });
-    } catch (error) {
-      console.error('Error saving chats:', error);
-    }
-  }, []);
+  const remoteSaveChats = useCallback(
+    async (chatsToSave: ChatModel[]) => {
+      if (!user) return;
+      try {
+        await fetch(`${url}/chats`, {
+          method: 'PUT',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ chats: chatsToSave }),
+        });
+      } catch (error) {
+        console.error('Error saving chats:', error);
+      }
+    },
+    [user],
+  );
 
   const fetchChats = useCallback(async () => {
     try {
@@ -77,7 +91,6 @@ function App() {
         }));
         setChats(fixedChats);
       } else {
-        // If no chats, use initChats and save them
         setChats(initChats);
         await remoteSaveChats(initChats);
       }
@@ -93,12 +106,6 @@ function App() {
       setChats(initChats);
     }
   }, [user, fetchChats]);
-
-  // useEffect(() => {
-  //   if (user && toSaveChats.current) {
-  //     saveChats();
-  //   }
-  // }, [chats, user, saveChats]);
 
   const checkAuthStatus = async () => {
     try {
@@ -127,7 +134,17 @@ function App() {
     });
   };
 
+  const showToast = (message: string, botName: string) => {
+    const id = generateObjectId();
+    setToasts((prevToasts) => [...prevToasts, { id, message, botName }]);
+  };
+
+  const removeToast = (id: string) => {
+    setToasts((prevToasts) => prevToasts.filter((toast) => toast.id !== id));
+  };
+
   const fetchQuote = async () => {
+    const prevChatId = currentChatId;
     const res = await fetch(`${url}/quote/in3sec`);
     const data: { quote: Quote } = await res.json();
     const message: MessageModel = {
@@ -137,7 +154,14 @@ function App() {
       timestamp: new Date(),
     };
     appendMessage(message);
-    // TOOD toast notification if message is not from selected chat
+
+    // previous reference was closed upon closure
+    const newChatId = currentChatIdRef.current;
+
+    if (prevChatId !== newChatId) {
+      const chat = chats.find((chat) => chat._id === prevChatId);
+      chat && showToast(message.content, chat.botName);
+    }
   };
 
   const handleSend = (messageStr: string) => {
@@ -152,8 +176,8 @@ function App() {
     fetchQuote();
   };
 
-  const handleSelectChat = (chatId: string) => {
-    setCurrentChatId(() => chatId);
+  const handleToggleSelectChat = (chatId: string) => {
+    setCurrentChatId((prev) => (prev === chatId ? null : chatId));
   };
 
   const remoteDeleteChat = async (chatId: string) => {
@@ -179,10 +203,10 @@ function App() {
   };
 
   const handleCreateChat = (botName: string) => {
-    if (!user || !botName) return;
+    if (!botName) return;
     const newChat: ChatModel = {
       _id: generateObjectId(),
-      ownerId: user._id,
+      ownerId: user ? user._id : null,
       botName: botName,
       messages: [],
     };
@@ -246,14 +270,7 @@ function App() {
   return (
     <>
       <main className='main'>
-        <aside
-          style={{
-            width: '30vw',
-            maxHeight: '100%',
-            overflow: 'auto',
-            outline: '1px dashed magenta',
-          }}
-        >
+        <aside className='sidebar'>
           <NavPanel>
             <AuthPanel
               user={user}
@@ -269,21 +286,14 @@ function App() {
           </NavPanel>
           <ChatList
             chats={filteredChats}
-            onSelect={(id: string) => handleSelectChat(id)}
+            onSelect={(id: string) => handleToggleSelectChat(id)}
             onDelete={(id: string) => handleDeleteChat(id)}
             onRename={(chatId: string, botName: string) =>
               handleBotRename(chatId, botName)
             }
           />
         </aside>
-        <section
-          style={{
-            width: '40vw',
-            maxHeight: '100%',
-            overflow: 'auto',
-            outline: '1px dashed limegreen',
-          }}
-        >
+        <section className='chat-section'>
           {currentChat ? (
             <Chat>
               <ChatHead botName={currentChat.botName} />
@@ -296,20 +306,27 @@ function App() {
               <ChatInput onSubmit={handleSend} />
             </Chat>
           ) : (
-            <p
-              style={{ color: 'grey', textAlign: 'center', marginTop: '2rem' }}
-            >
-              please select one of the chats
-            </p>
+            <p className='no-chat-selected'>Please select one of the chats</p>
           )}
         </section>
       </main>
 
-      <aside>
-        <p style={{ color: 'grey', textAlign: 'center', marginTop: '0rem' }}>
-          It is {import.meta.env.VITE_SERVER_URL}
-        </p>
-      </aside>
+      <div className='toast-container'>
+        {toasts.map((toast) => (
+          <Toast
+            key={toast.id}
+            message={toast.message}
+            botName={toast.botName}
+            onClose={() => removeToast(toast.id)}
+            onClick={() => {
+              setCurrentChatId(
+                chats.find((c) => c.botName === toast.botName)?._id || null,
+              );
+              removeToast(toast.id);
+            }}
+          />
+        ))}
+      </div>
     </>
   );
 }

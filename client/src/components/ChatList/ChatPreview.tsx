@@ -15,88 +15,71 @@ export default function ChatPreview({
   const [isRenaming, setIsRenaming] = useState(false);
   const [newBotName, setNewBotName] = useState(chat.botName);
   const lastMessage = chat.messages.at(-1);
-
   const [isDeleting, setIsDeleting] = useState(false);
 
   return (
-    <article
-      style={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        gap: '10%',
-        border: '2px solid darkgray',
-        padding: '0 0.8rem',
-      }}
-      onClick={() => onSelect(chat._id)}
-    >
-      <div
-        style={{
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-          whiteSpace: 'nowrap',
-        }}
-      >
-        <p
-          style={{
-            margin: '0.6rem 0',
-            overflow: 'hidden',
-            // textOverflow: 'ellipsis',
-            whiteSpace: 'wrap',
-            maxWidth: '100%',
-          }}
-        >
-          <button
-            onClick={(ev) => {
-              ev.stopPropagation();
-              if (isRenaming) onRename(newBotName);
-              setIsRenaming((ir) => !ir);
-            }}
-          >
-            {isRenaming ? 'confirm' : 'edit'}
-          </button>{' '}
-          {isRenaming ? (
-            <input
-              onClick={(ev) => ev.stopPropagation()}
-              value={newBotName}
-              onChange={(ev) => setNewBotName(ev.target.value)}
-            />
-          ) : (
-            chat.botName
-          )}
-        </p>
-        <p
-          style={{
-            margin: '0.6rem 0',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
-            maxWidth: '100%',
-          }}
-        >
-          {lastMessage?.content}
-        </p>
+    <article className='chat-preview'>
+      <div className='chat-preview-content' onClick={() => onSelect(chat._id)}>
+        <div className='chat-preview-header'>
+          <span className='chat-preview-name'>
+            {isRenaming ? (
+              <input
+                className='chat-preview-rename-input'
+                onClick={(ev) => ev.stopPropagation()}
+                value={newBotName}
+                onChange={(ev) => setNewBotName(ev.target.value)}
+              />
+            ) : (
+              chat.botName
+            )}
+          </span>
+          <span className='chat-preview-date'>
+            {lastMessage?.timestamp.toLocaleDateString()}
+          </span>
+        </div>
+        <p className='chat-preview-message'>{lastMessage?.content}</p>
       </div>
-      <div>
-        <p>{lastMessage?.timestamp.toLocaleDateString()}</p>
+      <div className='chat-preview-actions'>
         <button
-          style={{ marginTop: 'auto' }}
+          className='chat-preview-button'
           onClick={(ev) => {
             ev.stopPropagation();
-            setIsDeleting((id) => !id);
+            if (isRenaming) onRename(newBotName);
+            setIsRenaming((ir) => !ir);
           }}
         >
-          {isDeleting ? 'cancel' : 'delete'}
+          {isRenaming ? 'Confirm' : <i className='fas fa-pencil-alt'></i>}
         </button>
-        {isDeleting && (
-          <div>
-            <small>are you sure?</small>
+        {!isDeleting ? (
+          <button
+            className='chat-preview-button delete'
+            onClick={(ev) => {
+              ev.stopPropagation();
+              setIsDeleting(true);
+            }}
+          >
+            <i className='fas fa-trash-alt'></i>
+          </button>
+        ) : (
+          <div className='chat-preview-delete-confirm'>
+            <span>Are you sure?</span>
             <button
+              className='chat-preview-button delete'
               onClick={(ev) => {
                 ev.stopPropagation();
                 onDelete(chat._id);
               }}
             >
-              delete
+              Yes, delete
+            </button>
+            <button
+              className='chat-preview-button'
+              onClick={(ev) => {
+                ev.stopPropagation();
+                setIsDeleting(false);
+              }}
+            >
+              Cancel
             </button>
           </div>
         )}

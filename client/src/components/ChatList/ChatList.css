@@ -1,0 +1,109 @@
+/* ChatList.css */
+
+.chat-list {
+  background-color: var(--bg-secondary);
+  border-radius: 8px;
+  padding: 1rem;
+  overflow-y: auto;
+  max-height: 100%;
+}
+
+.chat-list-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: var(--text-primary);
+}
+
+.chat-preview {
+  background-color: var(--bg-tertiary);
+  border-radius: 8px;
+  margin-bottom: 0.8rem;
+  transition: background-color 0.2s ease;
+}
+
+.chat-preview:hover {
+  background-color: var(--bg-hover);
+}
+
+.chat-preview-content {
+  padding: 0.8rem;
+  cursor: pointer;
+}
+
+.chat-preview-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.chat-preview-name {
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.chat-preview-date {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.chat-preview-message {
+  color: var(--text-tertiary);
+  font-size: 0.9rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chat-preview-actions {
+  display: flex;
+  justify-content: flex-end;
+  /* flex-wrap: wrap; */
+  padding: 0.5rem;
+  gap: 0.6rem;
+  background-color: var(--bg-subtertiary);
+  border-bottom-left-radius: 6px;
+  border-bottom-right-radius: 6px;
+}
+
+.chat-preview-button {
+  background-color: var(--bg-button);
+  color: var(--text-primary);
+  border: none;
+  padding: 0.4rem 0.8rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.chat-preview-button:hover {
+  background-color: var(--bg-button-hover);
+}
+
+.chat-preview-button.delete {
+  color: #f0f0f0;
+  background-color: var(--bg-delete);
+}
+
+.chat-preview-button.delete:hover {
+  background-color: var(--bg-delete-hover);
+}
+
+.chat-preview-rename-input {
+  background-color: var(--bg-button);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  padding: 0.3rem;
+  border-radius: 4px;
+  width: 70%;
+}
+
+.chat-preview-delete-confirm {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  font-size: 0.8rem;
+  color: var(--text-delete);
+}

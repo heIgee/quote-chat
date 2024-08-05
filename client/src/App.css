@@ -1,21 +1,51 @@
 .main {
   display: flex;
   justify-content: center;
-  min-height: 90vh;
   gap: 2rem;
-  height: 80vh;
+  height: 90%;
 }
 
-@media (width < 768px) {
+ .sidebar {
+  width: 30vw;
+  max-height: 100%;
+  overflow: auto;
+  gap: 1rem;
+}
+
+.chat-section {
+  width: 40vw;
+  max-height: 100%;
+  overflow: auto;
+}
+
+.no-chat-selected {
+  color: var(--text-muted);
+  text-align: center;
+  margin-top: 2rem;
+}
+
+.toast-container {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 1000;
+}
+
+@media (width < 900px) {
   .main {
     flex-direction: column;
+    height: 100%;
+    gap: 1rem;
   }
   .main > * {
     width: 100% !important;
-    height: 45%;
+    height: 50%;
   }
-
-  body {
-    overflow-y: hidden;
+  .sidebar,
+  .chat-section {
+    width: 100% !important;
   }
 }

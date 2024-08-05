@@ -19,57 +19,48 @@ export default function ChatPanel({
     setFirstName('');
     setLastName('');
   };
+
   return (
-    <article>
-      <div
-        style={{
-          width: '100%',
-          outline: '1px dashed brown',
-          display: 'flex',
-          justifyContent: 'space-between',
-          padding: '0 1rem',
-        }}
-      >
+    <article className='chat-panel'>
+      <div className='chat-panel-row'>
         <input
+          className='input-field'
           type='text'
-          placeholder='search chats by name...'
+          placeholder='Search chats by name...'
           value={query}
           onChange={(ev) => setQuery(ev.target.value)}
         />
-        <button onClick={() => setIsCreatingChat((icc) => !icc)}>
-          {isCreatingChat ? 'cancel' : 'new chat'}
+        <button
+          className='button'
+          onClick={() => setIsCreatingChat((icc) => !icc)}
+        >
+          {isCreatingChat ? 'Cancel' : 'New Chat'}
         </button>
       </div>
 
-      <div
-        style={{
-          minHeight: '1rem',
-          width: '100%',
-          outline: '1px dashed brown',
-          display: 'flex',
-          justifyContent: 'space-between',
-          padding: '0 1rem',
-          marginTop: '1rem',
-        }}
-      >
-        {isCreatingChat && (
-          <>
+      {isCreatingChat && (
+        <div className='chat-panel-row'>
+          <div className='create-chat-form'>
             <input
+              className='input-field'
               type='text'
-              placeholder='first name'
+              placeholder='First name'
               value={firstName}
               onChange={(ev) => setFirstName(ev.target.value)}
             />
             <input
+              className='input-field'
               type='text'
-              placeholder='last name'
+              placeholder='Last name'
               value={lastName}
               onChange={(ev) => setLastName(ev.target.value)}
             />
-            <button onClick={handleCreate}>create</button>
-          </>
-        )}
-      </div>
+            <button className='button button-primary' onClick={handleCreate}>
+              Create
+            </button>
+          </div>
+        </div>
+      )}
     </article>
   );
 }

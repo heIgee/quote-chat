@@ -1,6 +1,6 @@
 export default function ChatHead({ botName }: { botName: string }) {
   return (
-    <div style={{ marginBottom: 'auto', textAlign: 'center' }}>
+    <div className='chat-head'>
       <p>🧑‍🦳 {botName}</p>
     </div>
   );
