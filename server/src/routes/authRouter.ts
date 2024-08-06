@@ -15,10 +15,11 @@ router.get(
 
 router.get(
   '/google/callback',
-  passport.authenticate('google', { failureRedirect: '/auth/fail' }),
+  passport.authenticate('google', { failureRedirect: '/auth/google' }),
   (req, res) => {
-    // auth successfull, redirect to React
-    console.log('Authentication successful, user:', req.user);
+    // auth successful, redirect to React
+    console.log('Authentication successful!');
+    console.log('User:', req.user);
     console.log('Session:', req.session);
     res.redirect(clientUri);
   },
