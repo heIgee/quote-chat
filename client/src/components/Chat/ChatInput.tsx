@@ -23,7 +23,9 @@ export default function ChatInput({
           name='message'
           placeholder='your message here...'
         />
-        <button type='submit'>Send</button>
+        <button type='submit'>
+          <i className='fas fa-paper-plane'></i>
+        </button>
       </form>
     </div>
   );

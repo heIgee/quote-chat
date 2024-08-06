@@ -3,9 +3,13 @@ import type MessageModel from '../../models/Message';
 import Message from './Message';
 
 export default function MessageList({
+  botName,
+  isBotTyping,
   messages,
   onEdit,
 }: {
+  botName: string;
+  isBotTyping: boolean;
   messages: MessageModel[];
   onEdit: (messageId: string, content: string) => void;
 }) {
@@ -28,6 +32,18 @@ export default function MessageList({
           onEdit={(content: string) => onEdit(m._id, content)}
         />
       ))}
+      {isBotTyping && (
+        <Message
+          message={{
+            _id: '-1',
+            isBot: true,
+            content: `${botName} is typing...`,
+            timestamp: new Date(),
+          }}
+          onEdit={() => {}}
+          excludeTime={true}
+        />
+      )}
       <div ref={messagesEndRef} />
     </div>
   );

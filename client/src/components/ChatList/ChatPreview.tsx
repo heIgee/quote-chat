@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import Chat from '../../models/Chat';
+import type ChatModel from '../../models/Chat';
 
 export default function ChatPreview({
   chat,
@@ -7,7 +7,7 @@ export default function ChatPreview({
   onDelete,
   onRename,
 }: {
-  chat: Chat;
+  chat: ChatModel;
   onSelect: (id: string) => void;
   onDelete: (id: string) => void;
   onRename: (botName: string) => void;

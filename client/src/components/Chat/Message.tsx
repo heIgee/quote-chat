@@ -4,9 +4,11 @@ import type MessageModel from '../../models/Message';
 export default function Message({
   message,
   onEdit,
+  excludeTime = false,
 }: {
   message: MessageModel;
   onEdit: (content: string) => void;
+  excludeTime?: boolean;
 }) {
   const [isEditing, setIsEditing] = useState(false);
   const [newMessageContent, setNewMessageContent] = useState(message.content);
@@ -45,9 +47,17 @@ export default function Message({
           )}
         </>
       )}
-      <small className='message-timestamp'>
-        {message.timestamp.toLocaleString()}
-      </small>
+      {!excludeTime && (
+        <small className='message-timestamp'>
+          {message.timestamp.toLocaleString([], {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+          })}
+        </small>
+      )}
     </div>
   );
 }

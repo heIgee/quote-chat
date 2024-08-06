@@ -1,5 +1,5 @@
 import './ChatList.css';
-import ChatModel from '../../models/Chat';
+import type ChatModel from '../../models/Chat';
 import ChatPreview from './ChatPreview';
 
 export default function ChatList({

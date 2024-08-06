@@ -1,5 +1,3 @@
-/* NavPanel.css */
-
 .nav-panel {
   min-height: 15%;
   display: flex;
@@ -16,7 +14,6 @@
   width: 100%;
   display: flex;
   justify-content: space-between;
-  /* flex-wrap: wrap; */
   gap: 0.6rem;
   align-items: center;
   padding: 0 1rem;
@@ -25,6 +22,44 @@
 .auth-panel h4 {
   margin: 0;
   color: var(--text-secondary);
+}
+
+.auth-panel small {
+  color: var(--text-tertiary);
+}
+
+.options-panel {
+  width: 100%;
+  display: flex;
+  gap: 0.8rem;
+  align-items: center;
+  padding: 0 1rem;
+}
+
+.theme-toggle,
+.auto-send-toggle {
+  color: var(--text-secondary);
+}
+
+.theme-toggle button, .auto-send-toggle button {
+  margin-left: 0.4rem;
+  font-size: 1rem;
+  background-color: transparent;
+  border: 1px dashed grey;
+  border-radius: 50%;
+  padding: 0.2rem;
+  color: var(--text-secondary);
+  transition: background-color 0.2s ease;
+}
+
+.theme-toggle button:hover,
+.auto-send-toggle button:hover {
+  background-color: var(--bg-subtertiary);
+}
+
+.theme-toggle button:active,
+.auto-send-toggle button:active {
+  background-color: var(--bg-tertiary);
 }
 
 .chat-panel {
@@ -50,7 +85,6 @@
   border-radius: 4px;
   padding: 0.5rem;
   flex-grow: 1;
-  /* margin-right: 0.5rem; */
 }
 
 .button {
@@ -72,7 +106,6 @@
 }
 
 .button-primary:hover {
-  /* color: #f0f0f0; */
   background-color: var(--bg-accent-hover);
 }
 
