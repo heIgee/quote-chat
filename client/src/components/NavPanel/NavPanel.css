@@ -41,7 +41,8 @@
   color: var(--text-secondary);
 }
 
-.theme-toggle button, .auto-send-toggle button {
+.theme-toggle button,
+.auto-send-toggle button {
   margin-left: 0.4rem;
   font-size: 1rem;
   background-color: transparent;

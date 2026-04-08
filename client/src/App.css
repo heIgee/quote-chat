@@ -40,10 +40,12 @@
     height: 100%;
     gap: 1rem;
   }
+
   .main > * {
     width: 100% !important;
     height: 50%;
   }
+
   .sidebar,
   .chat-section {
     width: 100% !important;

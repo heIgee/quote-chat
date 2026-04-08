@@ -4,5 +4,6 @@
   "endOfLine": "crlf",
   "trailingComma": "all",
   "singleQuote": true,
-  "jsxSingleQuote": true
+  "jsxSingleQuote": true,
+  "bracketSpacing": true
 }
