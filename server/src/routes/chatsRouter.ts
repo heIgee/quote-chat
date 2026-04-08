@@ -31,7 +31,7 @@ router.put(
       const updatedChats = await Promise.all(
         chats.map(async (chat) => {
           if (mongoose.Types.ObjectId.isValid(chat._id)) {
-            return await Chat.findOneAndUpdate(
+            return Chat.findOneAndUpdate(
               { _id: chat._id, ownerId: userId },
               {
                 botName: chat.botName,
@@ -63,7 +63,7 @@ router.delete(
   isAuthenticated,
   asyncHandler(async (req, res, next) => {
     try {
-      const chatId = req.params.id;
+      const chatId = req.params.id as string;
       const userId = req.user!._id;
 
       if (!mongoose.Types.ObjectId.isValid(chatId)) {
