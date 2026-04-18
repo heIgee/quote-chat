@@ -8,11 +8,11 @@
         "moduleResolution": "NodeNext",
         "sourceMap": true,
         "outDir": "dist",
-        "baseUrl": ".",
+        "rootDir": "src",
         "paths": {
             "*": [
-                "node_modules/@types/*",
-                "src/types/*"
+                "./node_modules/@types/*",
+                "./src/types/*"
             ]
         },
         "strictNullChecks": true,

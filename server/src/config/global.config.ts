@@ -1,9 +1,9 @@
 import { configDotenv } from 'dotenv';
 
 const inProduction = process.env.NODE_ENV === 'production';
-const clientUri = inProduction
+const clientUri = process.env.CLIENT_URL || (inProduction
   ? 'https://quote-chat.vercel.app'
-  : 'http://localhost:5173';
+  : 'http://localhost:5173');
 
 if (!inProduction) configDotenv();
 

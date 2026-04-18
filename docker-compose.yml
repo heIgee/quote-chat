@@ -1,0 +1,40 @@
+services:
+  mongo:
+    image: mongo:latest
+    container_name: quote-mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    restart: unless-stopped
+
+  server:
+    build: ./server
+    container_name: quote-server
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./server/.env
+    environment:
+      # Automatically route traffic to our local mongo service instead of Atlas
+      - ATLAS_URL=mongodb://mongo:27017/quote-chat
+      - NODE_ENV=development
+      - PORT=3000
+    depends_on:
+      - mongo
+    restart: unless-stopped
+
+  client:
+    build: ./client
+    container_name: quote-client
+    ports:
+      - "5173:5173"
+    environment:
+      # Tell Vite to reach out to the server mapped on the host machine
+      - VITE_SERVER_URL=${VITE_SERVER_URL:-http://localhost:3000}
+    depends_on:
+      - server
+    restart: unless-stopped
+
+volumes:
+  mongo-data:

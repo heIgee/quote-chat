@@ -18,9 +18,11 @@ export const configurePassport = () => {
   });
 
   // TODO fix oauth uri_mismatch without hardcoding uri
-  const callbackURL = inProduction
-    ? 'https://server-quiet-waterfall-3430.fly.dev/auth/google/callback'
-    : 'http://localhost:3000/auth/google/callback';
+  const callbackURL = process.env.SERVER_URL 
+    ? `${process.env.SERVER_URL}/auth/google/callback`
+    : (inProduction
+      ? 'https://server-quiet-waterfall-3430.fly.dev/auth/google/callback'
+      : 'http://localhost:3000/auth/google/callback');
 
   passport.use(
     new GoogleStrategy(
