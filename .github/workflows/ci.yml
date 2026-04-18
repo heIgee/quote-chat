@@ -47,22 +47,18 @@ jobs:
           npm run test:run
 
   static-analysis:
-    name: Static Code Analysis
+    name: Github CodeQL Static Analysis
     runs-on: ubuntu-latest
     permissions:
       contents: read
       security-events: write
     steps:
       - uses: actions/checkout@v4
-      - name: Run Codacy Analysis
-        # Pinned to v4 for stability
-        uses: codacy/codacy-analysis-cli-action@v4
+      
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
         with:
-          format: sarif
-          output: results.sarif
-          gh-code-scanning-compat: true
+          languages: javascript-typescript
           
-      - name: Upload SARIF
-        uses: github/codeql-action/upload-sarif@v3
-        with:
-          sarif_file: results.sarif
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
