@@ -1,0 +1,68 @@
+name: CI Pipeline
+
+on:
+  pull_request:
+    branches: [ "devops", "staging" ]
+    # Only trigger if code in these directories actually changes
+    paths:
+      - 'client/**'
+      - 'server/**'
+      - '.github/workflows/ci.yml'
+
+jobs:
+  build-client:
+    name: Client (Build & Test)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'npm'
+          cache-dependency-path: ./client/package-lock.json
+      - name: Install & Test
+        working-directory: ./client
+        run: |
+          npm ci
+          npm run build
+          npm run test:run
+
+  build-server:
+    name: Server (Build & Test)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'npm'
+          cache-dependency-path: ./server/package-lock.json
+      - name: Install & Test
+        working-directory: ./server
+        run: |
+          npm ci
+          npm run build
+          npm run test:run
+
+  static-analysis:
+    name: Static Code Analysis
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run Codacy Analysis
+        # Pinned to v4 for stability
+        uses: codacy/codacy-analysis-cli-action@v4
+        with:
+          format: sarif
+          output: results.sarif
+          gh-code-scanning-compat: true
+          
+      - name: Upload SARIF
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: results.sarif
