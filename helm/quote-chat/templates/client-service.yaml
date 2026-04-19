@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: quote-client
+spec:
+  type: {{ .Values.client.service.type }}
+  selector:
+    app: quote-client
+  ports:
+    - port: {{ .Values.client.service.port }}
+      targetPort: {{ .Values.client.service.port }}
+      nodePort: {{ .Values.client.service.nodePort }}

@@ -1,0 +1,21 @@
+client:
+  replicaCount: 1
+  image:
+    repository: quote-chat-client
+    tag: latest
+    pullPolicy: IfNotPresent
+  service:
+    type: NodePort
+    port: 5173
+    nodePort: 30173
+
+server:
+  replicaCount: 1
+  image:
+    repository: quote-chat-server
+    tag: latest
+    pullPolicy: IfNotPresent
+  service:
+    type: NodePort
+    port: 3000
+    nodePort: 30000

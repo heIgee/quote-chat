@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: quote-client
+spec:
+  replicas: {{ .Values.client.replicaCount }}
+  selector:
+    matchLabels:
+      app: quote-client
+  template:
+    metadata:
+      labels:
+        app: quote-client
+    spec:
+      containers:
+        - name: client
+          image: "{{ .Values.client.image.repository }}:{{ .Values.client.image.tag }}"
+          imagePullPolicy: {{ .Values.client.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.client.service.port }}
+          env:
+            - name: VITE_SERVER_URL
+              value: "http://localhost:3000"
+          readinessProbe:
+            httpGet:
+              path: /
+              port: {{ .Values.client.service.port }}
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /
+              port: {{ .Values.client.service.port }}
+            initialDelaySeconds: 20
+            periodSeconds: 20

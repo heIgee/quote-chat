@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: quote-server
+spec:
+  replicas: {{ .Values.server.replicaCount }}
+  selector:
+    matchLabels:
+      app: quote-server
+  template:
+    metadata:
+      labels:
+        app: quote-server
+    spec:
+      containers:
+        - name: server
+          image: "{{ .Values.server.image.repository }}:{{ .Values.server.image.tag }}"
+          imagePullPolicy: {{ .Values.server.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.server.service.port }}
+          envFrom:
+            - secretRef:
+                name: quote-server-secrets
+          env:
+            # We will name our bitnami installation "quote-mongodb"
+            - name: ATLAS_URL
+              value: "mongodb://quote-mongodb:27017/quote-chat"
+            - name: NODE_ENV
+              value: "development"
+            - name: PORT
+              value: "{{ .Values.server.service.port }}"
+          readinessProbe:
+            httpGet:
+              path: /
+              port: {{ .Values.server.service.port }}
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /
+              port: {{ .Values.server.service.port }}
+            initialDelaySeconds: 15
+            periodSeconds: 20
